@@ -26,6 +26,7 @@ no_index:
     - inc
     - t
 requires:
+  Data::UUID: 0
   RDF::TrineShortcuts: 0.100
   Scalar::Util: 0
   XML::Atom::Content: 0
@@ -41,4 +42,4 @@ resources:
   homepage: http://search.cpan.org/dist/XML-Atom-FromOWL/
   license: http://dev.perl.org/licenses/
   repository: http://goddamn.co.uk/viewvc/perlmods/XML-Atom-FromOWL/
-version: 0.001
+version: 0.002

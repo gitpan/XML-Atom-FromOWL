@@ -10,5 +10,10 @@ Home page:    <http://search.cpan.org/dist/XML-Atom-FromOWL/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-FromOWL>
 Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
 
+0.002 [2011-01-14]
+ - Force <entry> and <feed> elements to contain an <id> even if none is
+   provided in the input data.
+ - use Data::UUID
+
 0.001 [2011-01-13] # Initial release
 

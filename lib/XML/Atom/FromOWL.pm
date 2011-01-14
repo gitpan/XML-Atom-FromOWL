@@ -3,6 +3,7 @@ package XML::Atom::FromOWL;
 use 5.008;
 use common::sense;
 
+use Data::UUID;
 use RDF::TrineShortcuts qw[:all];
 use Scalar::Util qw[blessed];
 use XML::Atom::Content;
@@ -26,7 +27,7 @@ our (%feed_dispatch, %entry_dispatch);
 
 BEGIN
 {
-	$VERSION = '0.001';
+	$VERSION = '0.002';
 
 	%feed_dispatch = (
 		AWOL('entry')        => \&_export_feed_entry,
@@ -124,10 +125,7 @@ sub export_feed
 	my $triples = $model->get_statements($subject, undef, undef);
 	while (my $triple = $triples->next)
 	{
-		next
-			unless (substr($triple->predicate->uri, 0, length(&AWOL)) eq &AWOL or
-					  substr($triple->predicate->uri, 0, length(&AX)) eq &AX);
-
+#		warn("FEED: ".$triple->sse);
 		if (defined $feed_dispatch{$triple->predicate->uri}
 		and ref($feed_dispatch{$triple->predicate->uri}) eq 'CODE')
 		{
@@ -136,9 +134,11 @@ sub export_feed
 		}
 		else
 		{
-			#warn("FEED: " . $triple->predicate->uri . " not implemented yet!");
+#			warn("FEED: " . $triple->predicate->uri . " not implemented yet!");
 		}
 	}
+
+	$feed->id( $self->_make_id ) unless $feed->id;
 
 	return $feed;
 }
@@ -154,10 +154,7 @@ sub export_entry
 	my $triples = $model->get_statements($subject, undef, undef);
 	while (my $triple = $triples->next)
 	{
-#		next
-#			unless (substr($triple->predicate->uri, 0, length(&AWOL)) eq &AWOL or
-#					  substr($triple->predicate->uri, 0, length(&AX)) eq &AX);
-
+#		warn("ENTRY: ".$triple->sse);		
 		if (defined $entry_dispatch{$triple->predicate->uri}
 		and ref($entry_dispatch{$triple->predicate->uri}) eq 'CODE')
 		{
@@ -166,10 +163,12 @@ sub export_entry
 		}
 		else
 		{
-			#warn("ENTRY: " . $triple->predicate->uri . " not implemented yet!");
+#			warn("ENTRY: " . $triple->predicate->uri . " not implemented yet!");
 		}
 	}
-	
+
+	$entry->id( $self->_make_id ) unless $entry->id;
+
 	return $entry;
 }
 
@@ -425,6 +424,13 @@ sub _export_thing_ImageConstruct
 		my $attr = {};
 		return $thing->set(ATOM(), $tag, flatten_node($triple->object), $attr, 1);
 	}
+}
+
+sub _make_id
+{
+	my ($self) = @_;
+	$self->{uuid} ||= Data::UUID->new;
+	return 'urn:uuid:'.$self->{uuid}->create_str;
 }
 
 1;

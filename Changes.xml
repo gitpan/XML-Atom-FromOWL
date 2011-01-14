@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF xmlns:dbug="http://ontologi.es/doap-bugs#" xmlns:dc="http://purl.org/dc/terms/" xmlns:dcs="http://ontologi.es/doap-changeset#" xmlns:doap="http://usefulinc.com/ns/doap#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-<rdf:Description rdf:nodeID="rE36C88321F6211E090D1FB4E32C985D7r0">
+<rdf:Description rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br0">
+	<dcs:item rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br1"/>
+	<dcs:item rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br2"/>
+	<dcs:versus rdf:resource="http://purl.org/NET/cpan-uri/dist/XML-Atom-FromOWL/v_0-001"/>
+</rdf:Description>
+<rdf:Description rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br1">
+	<rdfs:label xml:lang="en">use Data::UUID</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br2">
+	<rdfs:label xml:lang="en">Force &lt;entry> and &lt;feed> elements to contain an &lt;id> even if none is provided in the input data.</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br3">
 	<doap:browse rdf:resource="http://goddamn.co.uk/viewvc/perlmods/XML-Atom-FromOWL/"/>
 	<rdf:type rdf:resource="http://usefulinc.com/ns/doap#SVNRepository"/>
 </rdf:Description>
@@ -22,7 +33,8 @@
 	<doap:name>XML-Atom-FromOWL</doap:name>
 	<doap:programming-language>Perl</doap:programming-language>
 	<doap:release rdf:resource="http://purl.org/NET/cpan-uri/dist/XML-Atom-FromOWL/v_0-001"/>
-	<doap:repository rdf:nodeID="rE36C88321F6211E090D1FB4E32C985D7r0"/>
+	<doap:release rdf:resource="http://purl.org/NET/cpan-uri/dist/XML-Atom-FromOWL/v_0-002"/>
+	<doap:repository rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br3"/>
 	<doap:shortdesc xml:lang="en">export RDF data to Atom</doap:shortdesc>
 	<doap:tester rdf:resource="http://tobyinkster.co.uk/#i"/>
 	<rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
@@ -33,6 +45,13 @@
 	<doap:revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.001</doap:revision>
 	<rdf:type rdf:resource="http://usefulinc.com/ns/doap#Version"/>
 	<rdfs:label xml:lang="en">Initial release</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://purl.org/NET/cpan-uri/dist/XML-Atom-FromOWL/v_0-002">
+	<dcs:changeset rdf:nodeID="rB989FD90200E11E09D6EE168D776694Br0"/>
+	<dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-01-14</dc:issued>
+	<doap:file-release rdf:resource="http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-FromOWL-0.002.tar.gz"/>
+	<doap:revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.002</doap:revision>
+	<rdf:type rdf:resource="http://usefulinc.com/ns/doap#Version"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://www.w3.org/2002/07/owl#" rdf:about="http://tobyinkster.co.uk/#i">
 	<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
