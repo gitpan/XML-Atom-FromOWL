@@ -10,6 +10,15 @@ Home page:    <http://search.cpan.org/dist/XML-Atom-FromOWL/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-FromOWL>
 Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
 
+0.003 [2011-01-19]
+ - (Addition) Export triples of the form { ?e ?p ?o . } where ?e is a feed
+   or entry and ?o is a literal, using Atom+RDFa
+ - (Addition) Support for Atom Feed Paging and Archiving.
+ - (Addition) Support for Atom Threading Extensions.
+ - (Addition) Support for exporting links which do not use AtomOWL's
+   reified Link construct.
+ - (Addition) Support for hNews.
+
 0.002 [2011-01-14]
  - Force <entry> and <feed> elements to contain an <id> even if none is
    provided in the input data.

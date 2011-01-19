@@ -12,13 +12,18 @@ use XML::Atom::Feed;
 use XML::Atom::Link;
 use XML::Atom::Person;
 
-use constant ATOM => 'http://www.w3.org/2005/Atom';
-sub AWOL { return 'http://bblfish.net/work/atom-owl/2006-06-06/#' . shift; }
-sub AX   { return 'http://buzzword.org.uk/rdf/atomix#' . shift; }
-sub FOAF { return 'http://xmlns.com/foaf/0.1/' . shift; }
-sub LINK { return 'http://www.iana.org/assignments/relation/' . shift; }
-sub RDF  { return 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' . shift; }
-sub XSD  { return 'http://www.w3.org/2001/XMLSchema#' . shift; }
+use constant ATOM  => 'http://www.w3.org/2005/Atom';
+use constant FH    => 'http://purl.org/syndication/history/1.0';
+use constant THR   => 'http://purl.org/syndication/thread/1.0';
+use constant XHTML => 'http://www.w3.org/1999/xhtml';
+
+sub AWOL  { return 'http://bblfish.net/work/atom-owl/2006-06-06/#' . shift; }
+sub AX    { return 'http://buzzword.org.uk/rdf/atomix#' . shift; }
+sub FOAF  { return 'http://xmlns.com/foaf/0.1/' . shift; }
+sub HNEWS { return 'http://ontologi.es/hnews#' . shift; }
+sub LINK  { return 'http://www.iana.org/assignments/relation/' . shift; }
+sub RDF   { return 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' . shift; }
+sub XSD   { return 'http://www.w3.org/2001/XMLSchema#' . shift; }
 
 use namespace::clean;
 
@@ -27,9 +32,10 @@ our (%feed_dispatch, %entry_dispatch);
 
 BEGIN
 {
-	$VERSION = '0.002';
+	$VERSION = '0.003';
 
 	%feed_dispatch = (
+		AWOL('Feed')         => sub {},
 		AWOL('entry')        => \&_export_feed_entry,
 		AWOL('id')           => \&_export_thing_id,
 		AWOL('title')        => \&_export_thing_TextConstruct,
@@ -42,8 +48,11 @@ BEGIN
 		AWOL('author')       => \&_export_thing_PersonConstruct,
 		AWOL('contributor')  => \&_export_thing_PersonConstruct,
 		AWOL('category')     => \&_export_thing_category,
+		AX('ArchiveFeed')    => \&_export_feed_fh_archive,
+		AX('CompleteFeed')   => \&_export_feed_fh_complete,
 		);
 	%entry_dispatch = (
+		AWOL('Entry')        => sub {},
 		AWOL('id')           => \&_export_thing_id,
 		AWOL('title')        => \&_export_thing_TextConstruct,
 		AWOL('summary')      => \&_export_thing_TextConstruct,
@@ -55,7 +64,9 @@ BEGIN
 		AWOL('contributor')  => \&_export_thing_PersonConstruct,
 		AWOL('category')     => \&_export_thing_category,
 		AWOL('content')      => \&_export_entry_content,
-		# source
+		AX('total')          => \&_export_entry_thr_total,
+		AX('in-reply-to')    => \&_export_entry_thr_in_reply_to,
+		# TODO:- atom:source
 		);
 }
 
@@ -122,22 +133,40 @@ sub export_feed
 	$attr->{uri} =~ s/::/-/g;
 	$feed->set(ATOM(), 'generator', __PACKAGE__, $attr, 1);
 
+	my $extra_links = {};
 	my $triples = $model->get_statements($subject, undef, undef);
 	while (my $triple = $triples->next)
 	{
-#		warn("FEED: ".$triple->sse);
+		next unless $triple->rdf_compatible;
+		
 		if (defined $feed_dispatch{$triple->predicate->uri}
 		and ref($feed_dispatch{$triple->predicate->uri}) eq 'CODE')
 		{
 			my $code = $feed_dispatch{$triple->predicate->uri};
 			$code->($self, $feed, $model, $triple, %options);
 		}
-		else
+		elsif ($triple->predicate->uri eq RDF('type')
+		and $triple->object->is_resource
+		and defined $feed_dispatch{$triple->object->uri}
+		and ref($feed_dispatch{$triple->object->uri}) eq 'CODE')
 		{
-#			warn("FEED: " . $triple->predicate->uri . " not implemented yet!");
+			my $code = $feed_dispatch{$triple->object->uri};
+			$code->($self, $feed, $model, $triple, %options);
+		}
+		elsif ($triple->object->is_resource)
+		{
+			my $rel  = $triple->predicate->uri;
+			$rel =~ s'^http://www\.iana\.org/assignments/relation/'';
+			$extra_links->{$rel} ||= {};
+			$extra_links->{$rel}{$triple->object->uri}++;
+		}
+		elsif ($triple->object->is_literal)
+		{
+			$self->_export_thing_LiteralValue($feed, $model, $triple, %options);
 		}
 	}
 
+	$self->_process_extra_links($feed, $model, $extra_links, %options);
 	$feed->id( $self->_make_id ) unless $feed->id;
 
 	return $feed;
@@ -151,25 +180,88 @@ sub export_entry
 	
 	my $entry = XML::Atom::Entry->new(Version => 1.0);
 
+	my $extra_links;
 	my $triples = $model->get_statements($subject, undef, undef);
 	while (my $triple = $triples->next)
 	{
-#		warn("ENTRY: ".$triple->sse);		
+		next unless $triple->rdf_compatible;
+		
 		if (defined $entry_dispatch{$triple->predicate->uri}
 		and ref($entry_dispatch{$triple->predicate->uri}) eq 'CODE')
 		{
 			my $code = $entry_dispatch{$triple->predicate->uri};
 			$code->($self, $entry, $model, $triple, %options);
 		}
-		else
+		elsif ($triple->predicate->uri eq RDF('type')
+		and $triple->object->is_resource
+		and defined $entry_dispatch{$triple->object->uri}
+		and ref($entry_dispatch{$triple->object->uri}) eq 'CODE')
 		{
-#			warn("ENTRY: " . $triple->predicate->uri . " not implemented yet!");
+			my $code = $entry_dispatch{$triple->object->uri};
+			$code->($self, $entry, $model, $triple, %options);
+		}
+		elsif ($triple->object->is_resource)
+		{
+			my $rel  = $triple->predicate->uri;
+			$rel =~ s'^http://www\.iana\.org/assignments/relation/'';
+			$extra_links->{$rel} ||= {};
+			$extra_links->{$rel}{$triple->object->uri}++;
+		}
+		elsif ($triple->object->is_literal)
+		{
+			$self->_export_thing_LiteralValue($entry, $model, $triple, %options);
 		}
 	}
 
+	$self->_process_extra_links($entry, $model, $extra_links, %options);
 	$entry->id( $self->_make_id ) unless $entry->id;
 
 	return $entry;
+}
+
+sub _process_extra_links
+{
+	my ($self, $thing, $model, $extras, %options) = @_;
+	return unless keys %$extras;
+	
+	my $already = {};
+	foreach my $link ($thing->links)
+	{
+		$already->{$link->rel} ||= {};
+		$already->{$link->rel}{$link->href}++;
+	}
+	
+	PRED: foreach my $predicate (keys %$extras)
+	{
+		OBJ: foreach my $object (keys %{ $extras->{$predicate} })
+		{
+			next OBJ if $already->{$predicate}{$object};
+			my $link = XML::Atom::Link->new(Version => 1.0);
+			$link->rel($predicate);
+			$link->href($object);
+			$thing->add_link($link);
+		}
+	}
+}
+
+sub _export_thing_LiteralValue
+{
+	my ($self, $thing, $model, $triple, %options) = @_;
+	my $ns = XML::Atom::Namespace->new(xhtml => XHTML);
+
+	if ($triple->object->is_literal)
+	{
+		my $attr = {
+			content  => $triple->object->literal_value,
+			property => $triple->predicate->uri,
+			};
+		$attr->{'xml:lang'} = $triple->object->literal_value_language
+			if $triple->object->has_language;
+		$attr->{'datatype'} = $triple->object->literal_datatype
+			if $triple->object->has_datatype;
+		$thing->set_attr(typeof => '');
+		return $thing->set($ns, 'meta', undef, $attr, 1);
+	}
 }
 
 sub _export_feed_entry
@@ -177,6 +269,59 @@ sub _export_feed_entry
 	my ($self, $feed, $model, $triple, %options) = @_;
 	my $entry = $self->export_entry($model, $triple->object, %options);
 	$feed->add_entry($entry);
+}
+
+sub _export_feed_fh_archive
+{
+	my ($self, $feed, $model, $triple, %options) = @_;
+	return $feed->set(FH, 'archive');
+}
+
+sub _export_feed_fh_complete
+{
+	my ($self, $feed, $model, $triple, %options) = @_;
+	return $feed->set(FH, 'complete');
+}
+
+sub _export_entry_thr_total
+{
+	my ($self, $entry, $model, $triple, %options) = @_;
+	return $entry->set(THR, 'total', $triple->object->literal_value)
+		if $triple->object->is_literal;
+}
+
+sub _export_entry_thr_in_reply_to
+{
+	my ($self, $entry, $model, $triple, %options) = @_;
+	my $attr;
+	
+	my $iter = $model->get_statements($triple->object);
+	while (my $st = $iter->next)
+	{
+		if ($st->predicate->uri eq LINK('self')
+		and $st->object->is_resource)
+		{
+			$attr->{href} = $st->object->uri;
+		}
+		elsif ($st->predicate->uri eq AWOL('id')
+		and !$st->object->is_blank)
+		{
+			$attr->{ref} = flatten_node($st->object);
+		}
+		elsif ($st->predicate->uri eq AWOL('source'))
+		{
+			my $iter2 = $model->get_statements($st->object, rdf_resource(LINK('self')));
+			while (my $st2 = $iter2->next)
+			{
+				if ($st2->object->is_resource)
+				{
+					$attr->{source} = $st2->object->uri;
+				}
+			}
+		}
+	}
+	
+	return $entry->set(THR, 'in-reply-to', undef, $attr);
 }
 
 sub _export_thing_id

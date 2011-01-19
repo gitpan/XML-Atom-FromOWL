@@ -42,4 +42,4 @@ resources:
   homepage: http://search.cpan.org/dist/XML-Atom-FromOWL/
   license: http://dev.perl.org/licenses/
   repository: http://goddamn.co.uk/viewvc/perlmods/XML-Atom-FromOWL/
-version: 0.002
+version: 0.003
