@@ -1,28 +1,34 @@
-############################################################################
-## Changes #################################################################
-############################################################################
-
 XML-Atom-FromOWL
 ================
 
 Created:      2011-01-12
-Home page:    <http://search.cpan.org/dist/XML-Atom-FromOWL/>
+Home page:    <https://metacpan.org/release/XML-Atom-FromOWL>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-FromOWL>
 Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
 
-0.003 [2011-01-19]
+0.100  2011-10-27
+
+ - (Update) use 5.010
+ - (Addition) Rudimentary support for ActivityStrea.ms.
+ - (Packaging) Module::Package::RDF
+
+0.003  2011-01-19
+
+ - (Addition) Support for hNews.
+ - (Addition) Support for Atom Feed Paging and Archiving.
  - (Addition) Export triples of the form { ?e ?p ?o . } where ?e is a feed
    or entry and ?o is a literal, using Atom+RDFa
- - (Addition) Support for Atom Feed Paging and Archiving.
- - (Addition) Support for Atom Threading Extensions.
  - (Addition) Support for exporting links which do not use AtomOWL's
    reified Link construct.
- - (Addition) Support for hNews.
+ - (Addition) Support for Atom Threading Extensions.
 
-0.002 [2011-01-14]
+0.002  2011-01-14
+
  - Force <entry> and <feed> elements to contain an <id> even if none is
    provided in the input data.
  - use Data::UUID
 
-0.001 [2011-01-13] # Initial release
+0.001  2011-01-13
+# Initial release
+
 

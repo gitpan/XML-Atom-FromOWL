@@ -1,6 +1,6 @@
 package XML::Atom::FromOWL;
 
-use 5.008;
+use 5.010;
 use common::sense;
 
 use Data::UUID;
@@ -12,12 +12,14 @@ use XML::Atom::Feed;
 use XML::Atom::Link;
 use XML::Atom::Person;
 
+use constant AS    => 'http://activitystrea.ms/spec/1.0/';
 use constant ATOM  => 'http://www.w3.org/2005/Atom';
 use constant FH    => 'http://purl.org/syndication/history/1.0';
 use constant THR   => 'http://purl.org/syndication/thread/1.0';
 use constant XHTML => 'http://www.w3.org/1999/xhtml';
 
 sub AWOL  { return 'http://bblfish.net/work/atom-owl/2006-06-06/#' . shift; }
+sub AAIR  { return 'http://xmlns.notu.be/aair#' . shift; }
 sub AX    { return 'http://buzzword.org.uk/rdf/atomix#' . shift; }
 sub FOAF  { return 'http://xmlns.com/foaf/0.1/' . shift; }
 sub HNEWS { return 'http://ontologi.es/hnews#' . shift; }
@@ -32,7 +34,7 @@ our (%feed_dispatch, %entry_dispatch);
 
 BEGIN
 {
-	$VERSION = '0.003';
+	$VERSION = '0.100';
 
 	%feed_dispatch = (
 		AWOL('Feed')         => sub {},
@@ -66,6 +68,10 @@ BEGIN
 		AWOL('content')      => \&_export_entry_content,
 		AX('total')          => \&_export_entry_thr_total,
 		AX('in-reply-to')    => \&_export_entry_thr_in_reply_to,
+		AAIR('activityVerb') => \&_export_entry_as_verb,
+		AAIR('activityObject') => \&_export_entry_as_ObjectConstruct,
+		AAIR('activityTarget') => \&_export_entry_as_ObjectConstruct,
+		'http://activitystrea.ms/schema/1.0/*' => \&_export_entry_as_object_type,
 		# TODO:- atom:source
 		);
 }
@@ -128,7 +134,7 @@ sub export_feed
 
 	my $attr = {
 		version => $VERSION,
-		uri     => 'http://search.cpan.org/dist/'.__PACKAGE__.'/',
+		uri     => 'https://metacpan.org/release/'.__PACKAGE__,
 		};
 	$attr->{uri} =~ s/::/-/g;
 	$feed->set(ATOM(), 'generator', __PACKAGE__, $attr, 1);
@@ -198,6 +204,14 @@ sub export_entry
 		and ref($entry_dispatch{$triple->object->uri}) eq 'CODE')
 		{
 			my $code = $entry_dispatch{$triple->object->uri};
+			$code->($self, $entry, $model, $triple, %options);
+		}
+		elsif ($triple->predicate->uri eq RDF('type')
+		and $triple->object->is_resource
+		and defined $entry_dispatch{ ($triple->object->qname)[0] . '*' }
+		and ref($entry_dispatch{ ($triple->object->qname)[0] . '*' }) eq 'CODE')
+		{
+			my $code = $entry_dispatch{ ($triple->object->qname)[0] . '*' };
 			$code->($self, $entry, $model, $triple, %options);
 		}
 		elsif ($triple->object->is_resource)
@@ -568,6 +582,50 @@ sub _export_thing_ImageConstruct
 	{
 		my $attr = {};
 		return $thing->set(ATOM(), $tag, flatten_node($triple->object), $attr, 1);
+	}
+}
+
+sub _export_entry_as_verb
+{
+	my ($self, $thing, $model, $triple, %options) = @_;
+
+	if ($triple->object->is_resource)
+	{
+		my $attr = {};
+		my $verb = flatten_node($triple->object);
+		$verb =~ s#^http://activitystrea\.ms/schema/1\.0/#./#;
+		return $thing->elem->addNewChild(AS(), 'as:verb')->appendText($verb);
+	}
+}
+
+sub _export_entry_as_object_type
+{
+	my ($self, $thing, $model, $triple, %options) = @_;
+
+	if ($triple->object->is_resource)
+	{
+		my $attr = {};
+		my $type = flatten_node($triple->object);
+		$type =~ s#^http://activitystrea\.ms/schema/1\.0/#./#;
+		return $thing->elem->addNewChild(AS(), 'as:object-type')->appendText($type);
+	}
+}
+
+sub _export_entry_as_ObjectConstruct
+{
+	my ($self, $thing, $model, $triple, %options) = @_;
+
+	my $tag = {
+		AAIR('activityObject') => 'object',
+		AAIR('activityTarget') => 'target',
+		}->{$triple->predicate->uri};
+	
+	if ($triple->object->is_resource or $triple->object->is_blank)
+	{
+		my $object_entry = $self->export_entry($model, $triple->object, %options);
+		my $node = $thing->elem->addNewChild(AS(), "as:$tag");
+		$node->appendChild($_->cloneNode(1)) for $object_entry->elem->childNodes;
+		return $node;
 	}
 }
 

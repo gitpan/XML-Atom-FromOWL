@@ -4,27 +4,31 @@ author:
   - 'Toby Inkster <tobyink@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.42
-  Module::Signature: 0.66
   Test::More: 0.61
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 1.00'
+generated_by: 'Module::Install version 1.02'
 keywords:
+  - ActivityStrea.ms
   - Atom
+  - Feed
+  - OWL
   - RDF
   - 'Semantic Web'
-  - OWL
-  - Feed
+  - Syndication
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
+module_name: XML::Atom::FromOWL
 name: XML-Atom-FromOWL
 no_index:
   directory:
+    - examples
     - inc
     - t
+    - xt
 requires:
   Data::UUID: 0
   RDF::TrineShortcuts: 0.100
@@ -34,12 +38,13 @@ requires:
   XML::Atom::Feed: 0
   XML::Atom::Link: 0
   XML::Atom::Person: 0
+  XML::LibXML: 1.70
   common::sense: 0
   namespace::clean: 0
-  perl: 5.8.0
+  perl: 5.10.0
 resources:
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-FromOWL
-  homepage: http://search.cpan.org/dist/XML-Atom-FromOWL/
+  homepage: https://metacpan.org/release/XML-Atom-FromOWL
   license: http://dev.perl.org/licenses/
-  repository: http://goddamn.co.uk/viewvc/perlmods/XML-Atom-FromOWL/
-version: 0.003
+  repository: http://goddamn.co.uk/svn-web/perlmods/browse/XML-Atom-FromOWL/
+version: 0.100
