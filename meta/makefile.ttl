@@ -7,10 +7,12 @@
 	:version_from _:main ;
 	:readme_from _:main ;
 	:test_requires "Test::More 0.61" ;
-	:requires "Data::UUID" , "XML::LibXML 1.70", "namespace::clean",
-		"RDF::TrineShortcuts 0.100", "Scalar::Util", "common::sense",
-		"XML::Atom::Content" , "XML::Atom::Entry" , "XML::Atom::Feed" ,
-		"XML::Atom::Link" , "XML::Atom::Person" .
+	:requires
+		"Data::UUID",
+		"XML::LibXML 1.94",
+		"namespace::clean",
+		"RDF::TrineX::Functions",
+		"XML::Atom".
 
 _:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/XML/Atom/FromOWL.pm" .
 

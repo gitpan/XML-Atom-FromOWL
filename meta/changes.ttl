@@ -54,3 +54,15 @@ my:v_0-100
 		dcs:item   [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
 		dcs:item   [ rdfs:label "use 5.010"@en ; a dcs:Update ] ;
 		] .
+
+my:project :release my:v_0-101 .
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2012-05-30"^^xsd:date ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-FromOWL-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-100 ;
+		dcs:item   [ rdfs:label "Drop common::sense dependency; use strict instead."@en ] ;
+		dcs:item   [ rdfs:label "Drop RDF::TrineShortcuts dependency; use RDF::TrineX::Functions instead."@en ]
+		] .

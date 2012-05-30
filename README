@@ -33,8 +33,8 @@ DESCRIPTION
         Returns a list of feeds found in the input, in no particular order.
 
         The input may be a URI, file name, RDF::Trine::Model or anything
-        else that can be handled by the "rdf_parse" method of
-        RDF::TrineShortcuts.
+        else that can be handled by the "parse" function of
+        RDF::TrineX::Functions.
 
         Each item in the list returned is an XML::Atom::Feed.
 
@@ -51,8 +51,8 @@ DESCRIPTION
         order.
 
         The input may be a URI, file name, RDF::Trine::Model or anything
-        else that can be handled by the "rdf_parse" method of
-        RDF::TrineShortcuts.
+        else that can be handled by the "parse" function of
+        RDF::TrineX::Functions.
 
         Each item in the list returned is an XML::Atom::Entry.
 
@@ -74,7 +74,7 @@ DESCRIPTION
     thing, but if your input is sensible that shouldn't be a problem.
 
 SEE ALSO
-    XML::Atom::OWL, HTML::Microformats, RDF::TrineShortcuts,
+    XML::Atom::OWL, HTML::Microformats, RDF::TrineX::Functions,
     XML::Atom::Feed, XML::Atom::Entry.
 
     <http://bblfish.net/work/atom-owl/2006-06-06/>.
@@ -84,9 +84,14 @@ SEE ALSO
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
-COPYRIGHT
-    Copyright 2011 Toby Inkster
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 

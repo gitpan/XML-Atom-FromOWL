@@ -1,10 +1,11 @@
 package XML::Atom::FromOWL;
 
 use 5.010;
-use common::sense;
+use strict;
+no warnings;
 
 use Data::UUID;
-use RDF::TrineShortcuts qw[:all];
+use RDF::TrineX::Functions -shortcuts_nodes;
 use Scalar::Util qw[blessed];
 use XML::Atom::Content;
 use XML::Atom::Entry;
@@ -29,12 +30,13 @@ sub XSD   { return 'http://www.w3.org/2001/XMLSchema#' . shift; }
 
 use namespace::clean;
 
-our $VERSION;
+our ($AUTHORITY, $VERSION);
 our (%feed_dispatch, %entry_dispatch);
 
 BEGIN
 {
-	$VERSION = '0.100';
+	$AUTHORITY  = 'cpan:TOBYINK';
+	$VERSION    = '0.101';
 
 	%feed_dispatch = (
 		AWOL('Feed')         => sub {},
@@ -135,7 +137,7 @@ sub export_feed
 	my $attr = {
 		version => $VERSION,
 		uri     => 'https://metacpan.org/release/'.__PACKAGE__,
-		};
+	};
 	$attr->{uri} =~ s/::/-/g;
 	$feed->set(ATOM(), 'generator', __PACKAGE__, $attr, 1);
 
@@ -686,7 +688,7 @@ for future use.
 Returns a list of feeds found in the input, in no particular order.
 
 The input may be a URI, file name, L<RDF::Trine::Model> or anything else
-that can be handled by the C<rdf_parse> method of L<RDF::TrineShortcuts>.
+that can be handled by the C<parse> function of L<RDF::TrineX::Functions>.
 
 Each item in the list returned is an L<XML::Atom::Feed>.
 
@@ -702,7 +704,7 @@ RDF::Trine::Node::Resource of type awol:Feed.
 Returns a list of entries found in the input, in no particular order.
 
 The input may be a URI, file name, L<RDF::Trine::Model> or anything else
-that can be handled by the C<rdf_parse> method of L<RDF::TrineShortcuts>.
+that can be handled by the C<parse> function of L<RDF::TrineX::Functions>.
 
 Each item in the list returned is an L<XML::Atom::Entry>.
 
@@ -730,7 +732,7 @@ shouldn't be a problem.
 
 =head1 SEE ALSO
 
-L<XML::Atom::OWL>, L<HTML::Microformats>, L<RDF::TrineShortcuts>,
+L<XML::Atom::OWL>, L<HTML::Microformats>, L<RDF::TrineX::Functions>,
 L<XML::Atom::Feed>, L<XML::Atom::Entry>.
 
 L<http://bblfish.net/work/atom-owl/2006-06-06/>.
@@ -741,10 +743,16 @@ L<http://www.perlrdf.org/>.
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENCE
 
-Copyright 2011 Toby Inkster
+This software is copyright (c) 2011-2012 by Toby Inkster.
 
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
