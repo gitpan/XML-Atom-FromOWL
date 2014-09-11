@@ -36,7 +36,7 @@ our (%feed_dispatch, %entry_dispatch);
 BEGIN
 {
 	$AUTHORITY  = 'cpan:TOBYINK';
-	$VERSION    = '0.101';
+	$VERSION    = '0.102';
 
 	%feed_dispatch = (
 		AWOL('Feed')         => sub {},
